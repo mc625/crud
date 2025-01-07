@@ -38,9 +38,13 @@ class LoginPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/dashboard'),
-                child: const Text('Bypass'),
+              GestureDetector(
+                onTap: () => Navigator.pushNamed(context, '/dashboard'),
+                child: Image.asset(
+                  'assets/images/logo_soko.png',
+                  height: 200,
+                  width: 200,
+                ),
               ),
               const Padding(padding: EdgeInsets.all(20.0)),
               const SizedBox(height: 20),

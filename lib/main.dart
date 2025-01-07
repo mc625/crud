@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'pages/barang_page.dart';
 import 'pages/login_page.dart';
-import 'pages/paketset.dart';
+import 'services/paketset.dart';
 import 'pages/paket_page.dart';
 import 'pages/sewa_page.dart';
 

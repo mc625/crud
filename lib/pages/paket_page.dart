@@ -1,7 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'paketset.dart'; // Import halaman untuk membuat paket
+import '../services/paketset.dart';
+import '../services/paket_services.dart';
 
 class PaketPage extends StatefulWidget {
   PaketPage({super.key});
@@ -11,46 +10,31 @@ class PaketPage extends StatefulWidget {
 }
 
 class _PaketPageState extends State<PaketPage> {
-  List<Map<String, dynamic>> paketList =
-      []; // Menyimpan semua paket dari Firestore
+  List<Map<String, dynamic>> paketList = [];
+  final PaketServices paketServices =
+      PaketServices(); // Inisialisasi PaketServices
 
   @override
   void initState() {
     super.initState();
-    fetchAllPaket(); // Panggil fungsi untuk mengambil semua data paket
+    fetchAllPaket();
   }
 
   Future<void> fetchAllPaket() async {
-    QuerySnapshot querySnapshot =
-        await FirebaseFirestore.instance.collection("dbpaket").get();
-    setState(() {
-      paketList = querySnapshot.docs.map((doc) {
-        var data = doc.data() as Map<String, dynamic>;
-        data['id'] = doc.id; // Menyimpan ID dokumen
-        return data;
-      }).toList();
-    });
+    paketList = await paketServices.fetchAllPaket();
+    setState(() {});
   }
 
   void deletePaket(String id) async {
-    await FirebaseFirestore.instance.collection("dbpaket").doc(id).delete();
-    Fluttertoast.showToast(
-      msg: "Paket Berhasil Dihapus",
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: ToastGravity.BOTTOM,
-      backgroundColor: Colors.red,
-      textColor: Colors.white,
-    );
+    await paketServices.deletePaket(id);
     fetchAllPaket(); // Ambil kembali daftar paket
   }
 
   void editPaket(Map<String, dynamic> paket) {
-    // Navigasi ke halaman edit paket
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) =>
-            PaketSetPage(paket: paket), // Kirim data paket untuk diedit
+        builder: (context) => PaketSetPage(paket: paket),
       ),
     ).then((_) {
       fetchAllPaket(); // Refresh daftar setelah kembali
@@ -132,12 +116,10 @@ class _PaketPageState extends State<PaketPage> {
             ),
             ElevatedButton(
               onPressed: () {
-                // Navigasi ke halaman buat paket
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        PaketSetPage(), // Ganti dengan PaketSet
+                    builder: (context) => PaketSetPage(),
                   ),
                 ).then((_) {
                   fetchAllPaket(); // Refresh daftar setelah kembali

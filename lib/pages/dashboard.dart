@@ -22,6 +22,14 @@ class Dashboard extends StatelessWidget {
                 padding: EdgeInsets.zero,
                 children: [
                   ListTile(
+                    title: Image.asset(
+                      'assets/images/logo_soko.png',
+                      height: 150,
+                      width: 150,
+                    ),
+                    onTap: () => Navigator.pushNamed(context, '/dashboard'),
+                  ),
+                  ListTile(
                     title: const Text('Dashboard',
                         style: TextStyle(color: Colors.white)),
                     onTap: () => Navigator.pushNamed(context, '/dashboard'),
