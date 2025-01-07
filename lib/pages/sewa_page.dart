@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:crud/services/sewa_services.dart';
 
 class SewaPage extends StatefulWidget {
@@ -33,7 +34,20 @@ class _SewaPageState extends State<SewaPage> {
     setState(() {});
   }
 
+  // Fungsi untuk memformat tanggal
+  String formatDate(DateTime? date) {
+    if (date == null) return '';
+    return DateFormat('dd-MM-yyyy').format(date); // Format hari-bulan-tahun
+  }
+
   Future<void> chooseBarang() async {
+    if (selectedPaket != null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(
+              "Anda sudah memilih paket. Hapus paket untuk memilih barang.")));
+      return;
+    }
+
     List<Map<String, dynamic>> barangList = await SewaServices.fetchBarang();
     List<bool> selectedCheckboxes = List.filled(barangList.length, false);
     List<int> quantities = List.filled(barangList.length, 1);
@@ -141,14 +155,12 @@ class _SewaPageState extends State<SewaPage> {
           content: SingleChildScrollView(
             child: Column(
               children: paketList.map((paket) {
-                return RadioListTile<Map<String, dynamic>>(
+                return ListTile(
                   title: Text(paket["Nama Paket"]),
                   subtitle: Text('Rp ${paket["Harga Paket"]}'),
-                  value: paket,
-                  groupValue: selectedPaket,
-                  onChanged: (Map<String, dynamic>? value) async {
+                  onTap: () async {
                     setState(() {
-                      selectedPaket = value;
+                      selectedPaket = paket;
                     });
                     if (selectedPaket != null) {
                       final isiPaketSnapshot = await FirebaseFirestore.instance
@@ -247,11 +259,11 @@ class _SewaPageState extends State<SewaPage> {
                 controller: phoneController,
                 decoration: InputDecoration(labelText: 'No hp'),
                 keyboardType: TextInputType.phone,
-                style: TextStyle(fontSize: 12)),
+                style: TextStyle(fontSize: 16)),
             TextField(
                 controller: addressController,
                 decoration: InputDecoration(labelText: 'Alamat'),
-                style: TextStyle(fontSize: 12)),
+                style: TextStyle(fontSize: 16)),
             Row(
               children: [
                 Expanded(
@@ -269,10 +281,9 @@ class _SewaPageState extends State<SewaPage> {
                       setState(() {});
                     },
                     controller: TextEditingController(
-                        text: startDate == null
-                            ? ''
-                            : "${startDate!.toLocal()}".split(' ')[0]),
-                    style: TextStyle(fontSize: 12),
+                        text:
+                            formatDate(startDate)), // Gunakan fungsi formatDate
+                    style: TextStyle(fontSize: 16),
                   ),
                 ),
                 SizedBox(width: 10),
@@ -291,10 +302,8 @@ class _SewaPageState extends State<SewaPage> {
                       setState(() {});
                     },
                     controller: TextEditingController(
-                        text: endDate == null
-                            ? ''
-                            : "${endDate!.toLocal()}".split(' ')[0]),
-                    style: TextStyle(fontSize: 12),
+                        text: formatDate(endDate)), // Gunakan fungsi formatDate
+                    style: TextStyle(fontSize: 16),
                   ),
                 ),
               ],
@@ -375,12 +384,12 @@ class _SewaPageState extends State<SewaPage> {
             ),
             SizedBox(height: 20),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                ElevatedButton(onPressed: submitData, child: Text('Submit')),
                 ElevatedButton(
                     onPressed: () => Navigator.pop(context),
                     child: Text('Batal')),
+                ElevatedButton(onPressed: submitData, child: Text('Submit')),
               ],
             ),
           ],
