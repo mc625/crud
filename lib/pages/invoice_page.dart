@@ -141,7 +141,9 @@ class InvoicePage extends StatelessWidget {
                   children: [
                     Text('INVOICE',
                         style: TextStyle(
-                            fontSize: 25, fontWeight: FontWeight.bold)),
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.red)),
                     Padding(
                       padding: const EdgeInsets.only(left: 8.0),
                       child: Image.asset(
