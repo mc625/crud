@@ -136,12 +136,23 @@ class InvoicePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(
-                    child: Text('INVOICE SOKO',
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('INVOICE',
                         style: TextStyle(
-                            fontSize: 25, fontWeight: FontWeight.bold))),
+                            fontSize: 25, fontWeight: FontWeight.bold)),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Image.asset(
+                        'assets/images/logo_soko.png',
+                        height: 50, // Atur tinggi logo
+                      ),
+                    ),
+                  ],
+                ),
                 SizedBox(height: 8),
-                Text('No.invoice.${data['no_invoice']}',
+                Text('No.${data['no_invoice']}',
                     style:
                         TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                 Text('Nama:  \t\t${data['nama']}',

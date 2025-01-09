@@ -95,9 +95,9 @@ class _DashboardState extends State<Dashboard> {
                     onTap: () => Navigator.pushNamed(context, '/paketpage'),
                   ),
                   ListTile(
-                    title: const Text('Laporan',
+                    title: const Text('Laporan (otw)',
                         style: TextStyle(color: Colors.white)),
-                    onTap: () => Navigator.pushNamed(context, '/paketpage'),
+                    onTap: () => Navigator.pushNamed(context, '/dashboard'),
                   ),
                 ],
               ),
