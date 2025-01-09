@@ -173,7 +173,7 @@ class _DashboardState extends State<Dashboard> {
                                       fontWeight: FontWeight.bold),
                                 ),
                                 Text(
-                                  'Rp ${rental["total_biaya"]}', // Ganti dengan field yang sesuai
+                                  'Rp.${rental["total_biaya"]}', // Ganti dengan field yang sesuai
                                   style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold),

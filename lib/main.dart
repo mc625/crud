@@ -20,7 +20,7 @@ void main() async {
             storageBucket: "crudapp-78677.firebasestorage.app",
             messagingSenderId: "932419693269",
             appId: "1:932419693269:web:40af1d4c320005b414905c",
-            measurementId: "G-NJ1YD6N6EF"));
+            measurementId: "G-NJ1YD6N6EF")); // web config
   } else {
     await Firebase.initializeApp();
   }

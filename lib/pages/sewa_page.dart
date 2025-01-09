@@ -20,6 +20,19 @@ class _SewaPageState extends State<SewaPage> {
   List<Map<String, dynamic>> paketIsi = [];
   double totalCost = 0;
 
+  String invoiceNumber = "";
+
+  @override
+  void initState() {
+    super.initState();
+    invoiceNumber = generateInvoiceNumber();
+  }
+
+  String generateInvoiceNumber() {
+    DateTime now = DateTime.now();
+    return DateFormat('yyyyMMddHHmmss').format(now); // Format: YYYYMMDDHHMMSS
+  }
+
   void calculateTotal() {
     totalCost = selectedBarang.fold(
         0,
@@ -34,10 +47,9 @@ class _SewaPageState extends State<SewaPage> {
     setState(() {});
   }
 
-  // Fungsi untuk memformat tanggal
   String formatDate(DateTime? date) {
     if (date == null) return '';
-    return DateFormat('dd-MM-yyyy').format(date); // Format hari-bulan-tahun
+    return DateFormat('dd-MM-yyyy').format(date);
   }
 
   Future<void> chooseBarang() async {
@@ -218,6 +230,7 @@ class _SewaPageState extends State<SewaPage> {
       "barang": selectedBarang,
       "paket": selectedPaket,
       "total_biaya": totalCost,
+      "no_invoice": invoiceNumber, // Menambahkan nomor invoice ke data
     };
 
     try {
@@ -234,6 +247,7 @@ class _SewaPageState extends State<SewaPage> {
         totalCost = 0;
         startDate = null;
         endDate = null;
+        invoiceNumber = generateInvoiceNumber(); // Generate invoice baru
       });
     } catch (error) {
       ScaffoldMessenger.of(context)
@@ -280,9 +294,8 @@ class _SewaPageState extends State<SewaPage> {
                       );
                       setState(() {});
                     },
-                    controller: TextEditingController(
-                        text:
-                            formatDate(startDate)), // Gunakan fungsi formatDate
+                    controller:
+                        TextEditingController(text: formatDate(startDate)),
                     style: TextStyle(fontSize: 16),
                   ),
                 ),
@@ -301,8 +314,8 @@ class _SewaPageState extends State<SewaPage> {
                       );
                       setState(() {});
                     },
-                    controller: TextEditingController(
-                        text: formatDate(endDate)), // Gunakan fungsi formatDate
+                    controller:
+                        TextEditingController(text: formatDate(endDate)),
                     style: TextStyle(fontSize: 16),
                   ),
                 ),
@@ -338,12 +351,14 @@ class _SewaPageState extends State<SewaPage> {
                       title: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('${item["Nama Barang"]} (x${item["Jumlah"]})',
+                          Text('(${item["Jumlah"]}x) ${item["Nama Barang"]}',
                               style: TextStyle(fontSize: 12)),
-                          Text('Rp ${totalItemCost.toStringAsFixed(2)}',
+                          Text('Total: Rp ${totalItemCost.toStringAsFixed(2)}',
                               style: TextStyle(fontSize: 12)),
                         ],
                       ),
+                      subtitle: Text('Rp.${item["Harga"]}/p',
+                          style: TextStyle(fontSize: 12)),
                       trailing: IconButton(
                           icon: Icon(Icons.delete, color: Colors.red),
                           onPressed: () => removeItem(index)),
