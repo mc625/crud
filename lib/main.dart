@@ -1,5 +1,6 @@
 import 'package:crud/pages/dashboard.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'pages/barang_page.dart';
 import 'pages/login_page.dart';
@@ -9,7 +10,21 @@ import 'pages/sewa_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+
+  if (kIsWeb) {
+    await Firebase.initializeApp(
+        options: FirebaseOptions(
+            apiKey: "AIzaSyDUH31l2JrxMRel8_WSVskDc8tWwNojl8g",
+            authDomain: "crudapp-78677.firebaseapp.com",
+            projectId: "crudapp-78677",
+            storageBucket: "crudapp-78677.firebasestorage.app",
+            messagingSenderId: "932419693269",
+            appId: "1:932419693269:web:40af1d4c320005b414905c",
+            measurementId: "G-NJ1YD6N6EF"));
+  } else {
+    await Firebase.initializeApp();
+  }
+
   runApp(const MyApp());
 }
 
