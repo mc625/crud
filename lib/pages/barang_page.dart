@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 import '../services/barang_services.dart';
 
 class BarangPage extends StatefulWidget {
@@ -35,13 +36,29 @@ class _BarangPageState extends State<BarangPage> {
   }
 
   uploadData() async {
+    // Coba parsing harga menjadi double
+    double? harga = double.tryParse(hargaController.text);
+
+    // Validasi harga
+    if (harga == null) {
+      Fluttertoast.showToast(
+          msg: "Harga tidak valid.",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+      return; // Keluar jika harga tidak valid
+    }
+
     Map<String, dynamic> uploaddata = {
       "Nama Barang": namaBarangController.text,
-      "Harga": hargaController.text,
+      "Harga": harga, // Simpan sebagai angka
     };
 
+    // Simpan atau update data barang
     if (selectedId != null) {
-      // Jika ada ID yang dipilih, berarti kita mengedit
       await DatabaseMethods().updateBarangDetails(selectedId!, uploaddata);
       Fluttertoast.showToast(
           msg: "Barang Berhasil Diedit",
@@ -52,7 +69,6 @@ class _BarangPageState extends State<BarangPage> {
           textColor: Colors.white,
           fontSize: 16.0);
     } else {
-      // Jika tidak ada ID, berarti kita menambahkan barang baru
       await DatabaseMethods().addBarangDetails(uploaddata);
       Fluttertoast.showToast(
           msg: "Barang Berhasil Disimpan",
@@ -77,7 +93,8 @@ class _BarangPageState extends State<BarangPage> {
 
   void editBarang(Map<String, dynamic> barang) {
     namaBarangController.text = barang["Nama Barang"];
-    hargaController.text = barang["Harga"];
+    hargaController.text =
+        barang["Harga"].toString(); // Pastikan ini adalah string
     selectedId = barang["id"]; // Simpan ID barang untuk diedit
   }
 
@@ -98,7 +115,8 @@ class _BarangPageState extends State<BarangPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tambah/Edit Barang'),
+        title: const Text('Tambah/Edit Barang',
+            style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.blue,
       ),
       body: Padding(
@@ -128,13 +146,13 @@ class _BarangPageState extends State<BarangPage> {
                   return Card(
                     child: ListTile(
                       title: Text(
-                        "Nama Barang: ${barang["Nama Barang"]}",
+                        "${barang["Nama Barang"]}",
                         style: TextStyle(
                           fontSize: 15.0,
                         ),
                       ),
                       subtitle: Text(
-                        "Harga: Rp.${barang["Harga"]}",
+                        "Rp ${NumberFormat('#,###').format(barang["Harga"] is num ? barang["Harga"] : double.tryParse(barang["Harga"].toString()) ?? 0)}", // Format harga di sini
                         style: TextStyle(
                           fontSize: 15.0,
                         ),

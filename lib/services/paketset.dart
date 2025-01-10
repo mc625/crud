@@ -134,7 +134,8 @@ class _PaketSetPageState extends State<PaketSetPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tambah/Edit Paket'),
+        title: const Text('Tambah/Edit Paket',
+            style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.blue,
       ),
       body: Padding(

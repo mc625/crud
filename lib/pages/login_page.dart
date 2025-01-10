@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatelessWidget {
@@ -7,16 +8,31 @@ class LoginPage extends StatelessWidget {
   LoginPage({super.key});
 
   Future<void> _login(BuildContext context) async {
-    const validUsername = "user";
-    const validPassword = "pass";
-    String username = usernameController.text;
-    String password = passwordController.text;
+    String username = usernameController.text.trim();
+    String password = passwordController.text.trim();
 
-    if (username == validUsername && password == validPassword) {
-      Navigator.pushReplacementNamed(context, '/dashboard');
-    } else {
+    try {
+      // Ambil data pengguna dari koleksi "akun"
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('akun')
+          .where('username', isEqualTo: username)
+          .where('password', isEqualTo: password)
+          .get();
+
+      // Memeriksa apakah ada hasil
+      if (querySnapshot.docs.isNotEmpty) {
+        // Jika ada, navigasi ke dashboard
+        Navigator.pushReplacementNamed(context, '/dashboard');
+      } else {
+        // Jika tidak ada, tampilkan pesan kesalahan
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Username atau password salah')),
+        );
+      }
+    } catch (e) {
+      // Menangani kesalahan saat mengambil data dari Firestore
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('username atau password salah')),
+        SnackBar(content: Text('Error: $e')),
       );
     }
   }
@@ -25,11 +41,6 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'LOGIN',
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.blue,
         automaticallyImplyLeading: false,
       ),
       body: Center(
@@ -51,7 +62,7 @@ class LoginPage extends StatelessWidget {
               TextField(
                 controller: usernameController,
                 decoration: InputDecoration(
-                  labelText: 'Username = "user"',
+                  labelText: 'Username',
                   filled: true,
                   fillColor: Colors.grey[200],
                   border: OutlineInputBorder(
@@ -64,7 +75,7 @@ class LoginPage extends StatelessWidget {
               TextField(
                 controller: passwordController,
                 decoration: InputDecoration(
-                  labelText: 'Password = "pass"',
+                  labelText: 'Password',
                   filled: true,
                   fillColor: Colors.grey[200],
                   border: OutlineInputBorder(

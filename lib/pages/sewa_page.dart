@@ -52,6 +52,12 @@ class _SewaPageState extends State<SewaPage> {
     return DateFormat('dd-MM-yyyy').format(date);
   }
 
+  String formatCurrency(double amount) {
+    return NumberFormat.currency(
+            locale: 'id_ID', symbol: 'Rp ', decimalDigits: 0)
+        .format(amount);
+  }
+
   Future<void> chooseBarang() async {
     if (selectedPaket != null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -94,7 +100,8 @@ class _SewaPageState extends State<SewaPage> {
                           },
                         ),
                         Expanded(child: Text(barang["Nama Barang"])),
-                        Text('Rp ${barang["Harga"]}'),
+                        Text(formatCurrency(
+                            double.tryParse(barang["Harga"].toString()) ?? 0)),
                         SizedBox(width: 10),
                         Container(
                           width: 50,
@@ -169,7 +176,8 @@ class _SewaPageState extends State<SewaPage> {
               children: paketList.map((paket) {
                 return ListTile(
                   title: Text(paket["Nama Paket"]),
-                  subtitle: Text('Rp ${paket["Harga Paket"]}'),
+                  subtitle: Text(formatCurrency(
+                      double.tryParse(paket["Harga Paket"].toString()) ?? 0)),
                   onTap: () async {
                     setState(() {
                       selectedPaket = paket;
@@ -329,7 +337,7 @@ class _SewaPageState extends State<SewaPage> {
                 SizedBox(width: 10),
                 ElevatedButton(onPressed: choosePaket, child: Text('Paket')),
                 SizedBox(width: 10),
-                Text('Rp $totalCost', style: TextStyle(fontSize: 18)),
+                Text(formatCurrency(totalCost), style: TextStyle(fontSize: 18)),
               ],
             ),
             SizedBox(height: 20),
@@ -353,11 +361,15 @@ class _SewaPageState extends State<SewaPage> {
                         children: [
                           Text('(${item["Jumlah"]}x) ${item["Nama Barang"]}',
                               style: TextStyle(fontSize: 12)),
-                          Text('Total: Rp ${totalItemCost.toStringAsFixed(2)}',
+                          Text(formatCurrency(totalItemCost),
                               style: TextStyle(fontSize: 12)),
                         ],
                       ),
-                      subtitle: Text('Rp.${item["Harga"]}/p',
+                      subtitle: Text(
+                          formatCurrency(
+                                  double.tryParse(item["Harga"].toString()) ??
+                                      0) +
+                              '/p',
                           style: TextStyle(fontSize: 12)),
                       trailing: IconButton(
                           icon: Icon(Icons.delete, color: Colors.red),

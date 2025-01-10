@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:crud/pages/invoice_page.dart';
@@ -53,6 +54,20 @@ class _DashboardState extends State<Dashboard> {
     return DateFormat('dd-MM-yyyy').format(date); // Format tanggal-bulan-tahun
   }
 
+  // Fungsi untuk logout
+  Future<void> _logout() async {
+    try {
+      await FirebaseAuth.instance.signOut(); // Mengeluarkan pengguna
+      Navigator.pushReplacementNamed(
+          context, '/login'); // Navigasi ke halaman login
+    } catch (e) {
+      // Menangani kesalahan jika terjadi saat logout
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal logout: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,9 +110,14 @@ class _DashboardState extends State<Dashboard> {
                     onTap: () => Navigator.pushNamed(context, '/paketpage'),
                   ),
                   ListTile(
-                    title: const Text('Laporan (otw)',
+                    title: const Text('Laporan',
                         style: TextStyle(color: Colors.white)),
-                    onTap: () => Navigator.pushNamed(context, '/dashboard'),
+                    onTap: () => Navigator.pushNamed(context, '/laporan'),
+                  ),
+                  ListTile(
+                    title: const Text('Logout',
+                        style: TextStyle(color: Colors.white)),
+                    onTap: _logout, // Panggil fungsi logout saat di tekan
                   ),
                 ],
               ),
@@ -173,7 +193,7 @@ class _DashboardState extends State<Dashboard> {
                                       fontWeight: FontWeight.bold),
                                 ),
                                 Text(
-                                  'Rp.${rental["total_biaya"]}', // Ganti dengan field yang sesuai
+                                  'Rp ${NumberFormat('#,###').format(rental["total_biaya"])}', // Menggunakan format yang diinginkan
                                   style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // Impor intl untuk pemformatan angka
 import '../services/paketset.dart';
 import '../services/paket_services.dart';
 
@@ -45,7 +46,8 @@ class _PaketPageState extends State<PaketPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Daftar Paket'),
+        title:
+            const Text('Daftar Paket', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.blue,
       ),
       body: Padding(
@@ -59,6 +61,12 @@ class _PaketPageState extends State<PaketPage> {
                       itemCount: paketList.length,
                       itemBuilder: (context, index) {
                         final paket = paketList[index];
+
+                        // Konversi harga menjadi double jika diperlukan
+                        double hargaPaket =
+                            double.tryParse(paket["Harga Paket"].toString()) ??
+                                0.0;
+
                         return Container(
                           margin: const EdgeInsets.symmetric(vertical: 8.0),
                           padding: const EdgeInsets.all(16.0),
@@ -82,7 +90,7 @@ class _PaketPageState extends State<PaketPage> {
                                         fontSize: 16),
                                   ),
                                   Text(
-                                    'Rp.${paket["Harga Paket"]}',
+                                    'Rp ${NumberFormat('#,###').format(hargaPaket)}', // Format harga di sini
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 15),

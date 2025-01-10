@@ -1,15 +1,18 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class InvoicePage extends StatelessWidget {
   final String sewaId;
+  final bool isCompleted;
 
-  InvoicePage({required this.sewaId});
+  InvoicePage({required this.sewaId, this.isCompleted = false});
 
-  Future<Map<String, dynamic>?> fetchSewaData() async {
-    DocumentSnapshot snapshot =
-        await FirebaseFirestore.instance.collection('dbsewa').doc(sewaId).get();
+  Future<Map<String, dynamic>?> fetchData() async {
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance
+        .collection(isCompleted ? 'dbselesai' : 'dbsewa')
+        .doc(sewaId)
+        .get();
     return snapshot.data() as Map<String, dynamic>?;
   }
 
@@ -18,15 +21,63 @@ class InvoicePage extends StatelessWidget {
     return DateFormat('dd-MM-yyyy').format(date);
   }
 
+  Future<void> moveDataToCompleted(BuildContext context) async {
+    final sewaData = await fetchData();
+    if (sewaData != null) {
+      // Simpan data ke dbselesai
+      await FirebaseFirestore.instance.collection('dbselesai').add(sewaData);
+      // Hapus data dari dbsewa jika berasal dari dbsewa
+      if (!isCompleted) {
+        await FirebaseFirestore.instance
+            .collection('dbsewa')
+            .doc(sewaId)
+            .delete();
+      }
+
+      // Tampilkan pesan sukses
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Data berhasil dipindahkan ke dbselesai')),
+      );
+      Navigator.pop(context); // Kembali ke halaman sebelumnya
+    }
+  }
+
+  void showConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Selesai?'),
+          content: Text('Konfirmasi jika transaksi ini selesai'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Tutup dialog
+              },
+              child: Text('Batal'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Tutup dialog
+                moveDataToCompleted(context); // Pindahkan data
+              },
+              child: Text('Ya'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Invoice'),
+        title: Text('Invoice', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.blue,
       ),
       body: FutureBuilder<Map<String, dynamic>?>(
-        future: fetchSewaData(),
+        future: fetchData(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -40,16 +91,10 @@ class InvoicePage extends StatelessWidget {
 
           final data = snapshot.data!;
           final barang = data['barang'] as List<dynamic>? ?? [];
-          var paket = data['paket']; // Ambil paket
-
-          // Pastikan paket adalah Map
-          if (paket is! Map<String, dynamic>) {
-            paket = {}; // Jika bukan Map, set paket menjadi Map kosong
-          }
+          final paket = data['paket'] as Map<String, dynamic>? ?? {};
 
           List<Widget> barangWidgets = [];
 
-          // Menampilkan barang
           if (barang.isNotEmpty) {
             barangWidgets.add(Container(
               color: Colors.blue.shade100,
@@ -79,14 +124,13 @@ class InvoicePage extends StatelessWidget {
                       (item["Jumlah"] ?? 1);
               return buildItemRow(
                 '  ${item["Nama Barang"]}',
-                '${item["Harga"]}',
+                'Rp ${NumberFormat('#,###').format(double.tryParse(item["Harga"].toString()) ?? 0)}',
                 '${item["Jumlah"]}',
-                '${itemTotal.toStringAsFixed(0)}',
+                'Rp ${NumberFormat('#,###').format(itemTotal)}',
               );
             }).toList());
           }
 
-          // Menampilkan paket
           List<Widget> paketWidgets = [];
           if (paket.isNotEmpty) {
             paketWidgets.add(Row(
@@ -116,17 +160,13 @@ class InvoicePage extends StatelessWidget {
               ),
             ));
 
-            // Memastikan barang dalam paket adalah iterable
             List<dynamic> barangDalamPaket = paket['Barang'] ?? [];
             for (var item in barangDalamPaket) {
               if (item is Map<String, dynamic>) {
                 String namaBarang = item["Nama Barang"] ?? "";
                 String jumlah = item["Jumlah"]?.toString() ?? "0";
 
-                paketWidgets.add(buildItemRow(
-                  namaBarang, // Nama barang dari paket
-                  jumlah, // Jumlah barang dari paket
-                ));
+                paketWidgets.add(buildItemRow(namaBarang, jumlah));
               }
             }
           }
@@ -146,10 +186,8 @@ class InvoicePage extends StatelessWidget {
                             color: Colors.red)),
                     Padding(
                       padding: const EdgeInsets.only(left: 8.0),
-                      child: Image.asset(
-                        'assets/images/logo_soko.png',
-                        height: 50, // Atur tinggi logo
-                      ),
+                      child: Image.asset('assets/images/logo_soko.png',
+                          height: 50),
                     ),
                   ],
                 ),
@@ -185,7 +223,8 @@ class InvoicePage extends StatelessWidget {
                     Text('TOTAL KESELURUHAN:',
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold)),
-                    Text('Rp ${data['total_biaya'] ?? "0"}',
+                    Text(
+                        'Rp ${NumberFormat('#,###').format(double.tryParse(data['total_biaya'].toString()) ?? 0)}',
                         style: TextStyle(
                             fontSize: 16, fontWeight: FontWeight.bold)),
                   ],
@@ -195,6 +234,17 @@ class InvoicePage extends StatelessWidget {
           );
         },
       ),
+      floatingActionButton: !isCompleted
+          ? FloatingActionButton(
+              onPressed: () {
+                showConfirmationDialog(context); // Tampilkan dialog konfirmasi
+              },
+              child: Icon(Icons.check), // Simbol centang
+              backgroundColor: Colors.green,
+              tooltip: 'Pindahkan ke dbselesai', // Tooltip untuk tombol
+            )
+          : null,
+      floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
     );
   }
 
