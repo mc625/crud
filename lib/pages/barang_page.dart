@@ -12,16 +12,16 @@ class BarangPage extends StatefulWidget {
 }
 
 class _BarangPageState extends State<BarangPage> {
-  List<Map<String, dynamic>> barangList = []; // Menyimpan semua data barang
+  List<Map<String, dynamic>> barangList = [];
 
   final TextEditingController namaBarangController = TextEditingController();
   final TextEditingController hargaController = TextEditingController();
-  String? selectedId; // Menyimpan ID barang yang dipilih untuk diedit
+  String? selectedId;
 
   @override
   void initState() {
     super.initState();
-    fetchAllBarang(); // Panggil fungsi untuk mengambil semua data barang
+    fetchAllBarang();
   }
 
   Future<void> fetchAllBarang() async {
@@ -29,17 +29,15 @@ class _BarangPageState extends State<BarangPage> {
     setState(() {
       barangList = querySnapshot.docs.map((doc) {
         var data = doc.data() as Map<String, dynamic>;
-        data['id'] = doc.id; // Menyimpan ID dokumen
+        data['id'] = doc.id;
         return data;
       }).toList();
     });
   }
 
   uploadData() async {
-    // Coba parsing harga menjadi double
     double? harga = double.tryParse(hargaController.text);
 
-    // Validasi harga
     if (harga == null) {
       Fluttertoast.showToast(
           msg: "Harga tidak valid.",
@@ -49,15 +47,14 @@ class _BarangPageState extends State<BarangPage> {
           backgroundColor: Colors.red,
           textColor: Colors.white,
           fontSize: 16.0);
-      return; // Keluar jika harga tidak valid
+      return;
     }
 
     Map<String, dynamic> uploaddata = {
       "Nama Barang": namaBarangController.text,
-      "Harga": harga, // Simpan sebagai angka
+      "Harga": harga,
     };
 
-    // Simpan atau update data barang
     if (selectedId != null) {
       await DatabaseMethods().updateBarangDetails(selectedId!, uploaddata);
       Fluttertoast.showToast(
@@ -80,22 +77,20 @@ class _BarangPageState extends State<BarangPage> {
           fontSize: 16.0);
     }
 
-    // Setelah mengupload, ambil data lagi
     fetchAllBarang();
-    clearFields(); // Hapus field setelah upload
+    clearFields();
   }
 
   void clearFields() {
     namaBarangController.clear();
     hargaController.clear();
-    selectedId = null; // Reset ID yang dipilih
+    selectedId = null;
   }
 
   void editBarang(Map<String, dynamic> barang) {
     namaBarangController.text = barang["Nama Barang"];
-    hargaController.text =
-        barang["Harga"].toString(); // Pastikan ini adalah string
-    selectedId = barang["id"]; // Simpan ID barang untuk diedit
+    hargaController.text = barang["Harga"].toString();
+    selectedId = barang["id"];
   }
 
   void deleteBarang(String id) async {
@@ -108,7 +103,7 @@ class _BarangPageState extends State<BarangPage> {
         backgroundColor: Colors.red,
         textColor: Colors.white,
         fontSize: 16.0);
-    fetchAllBarang(); // Ambil kembali daftar barang
+    fetchAllBarang();
   }
 
   @override
@@ -152,7 +147,7 @@ class _BarangPageState extends State<BarangPage> {
                         ),
                       ),
                       subtitle: Text(
-                        "Rp ${NumberFormat('#,###').format(barang["Harga"] is num ? barang["Harga"] : double.tryParse(barang["Harga"].toString()) ?? 0)}", // Format harga di sini
+                        "Rp ${NumberFormat('#,###').format(barang["Harga"] is num ? barang["Harga"] : double.tryParse(barang["Harga"].toString()) ?? 0)}",
                         style: TextStyle(
                           fontSize: 15.0,
                         ),

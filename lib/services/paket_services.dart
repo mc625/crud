@@ -9,7 +9,7 @@ class PaketServices {
     QuerySnapshot querySnapshot = await firestore.collection("dbpaket").get();
     return querySnapshot.docs.map((doc) {
       var data = doc.data() as Map<String, dynamic>;
-      data['id'] = doc.id; // Menyimpan ID dokumen
+      data['id'] = doc.id;
       return data;
     }).toList();
   }

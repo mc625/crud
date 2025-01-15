@@ -12,7 +12,6 @@ import 'pages/laporan_page.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Inisialisasi Firebase
   if (kIsWeb) {
     await Firebase.initializeApp(
       options: FirebaseOptions(
@@ -24,9 +23,9 @@ void main() async {
         appId: "1:932419693269:web:40af1d4c320005b414905c",
         measurementId: "G-NJ1YD6N6EF",
       ),
-    ); // Konfigurasi untuk web
+    );
   } else {
-    await Firebase.initializeApp(); // Konfigurasi untuk mobile
+    await Firebase.initializeApp();
   }
 
   runApp(const MyApp());

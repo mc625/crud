@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // Impor intl untuk pemformatan angka
+import 'package:intl/intl.dart';
 import '../services/paketset.dart';
 import '../services/paket_services.dart';
 
@@ -12,8 +12,7 @@ class PaketPage extends StatefulWidget {
 
 class _PaketPageState extends State<PaketPage> {
   List<Map<String, dynamic>> paketList = [];
-  final PaketServices paketServices =
-      PaketServices(); // Inisialisasi PaketServices
+  final PaketServices paketServices = PaketServices();
 
   @override
   void initState() {
@@ -28,7 +27,7 @@ class _PaketPageState extends State<PaketPage> {
 
   void deletePaket(String id) async {
     await paketServices.deletePaket(id);
-    fetchAllPaket(); // Ambil kembali daftar paket
+    fetchAllPaket();
   }
 
   void editPaket(Map<String, dynamic> paket) {
@@ -38,7 +37,7 @@ class _PaketPageState extends State<PaketPage> {
         builder: (context) => PaketSetPage(paket: paket),
       ),
     ).then((_) {
-      fetchAllPaket(); // Refresh daftar setelah kembali
+      fetchAllPaket();
     });
   }
 
@@ -62,7 +61,6 @@ class _PaketPageState extends State<PaketPage> {
                       itemBuilder: (context, index) {
                         final paket = paketList[index];
 
-                        // Konversi harga menjadi double jika diperlukan
                         double hargaPaket =
                             double.tryParse(paket["Harga Paket"].toString()) ??
                                 0.0;
@@ -90,7 +88,7 @@ class _PaketPageState extends State<PaketPage> {
                                         fontSize: 16),
                                   ),
                                   Text(
-                                    'Rp ${NumberFormat('#,###').format(hargaPaket)}', // Format harga di sini
+                                    'Rp ${NumberFormat('#,###').format(hargaPaket)}',
                                     style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 15),
@@ -130,7 +128,7 @@ class _PaketPageState extends State<PaketPage> {
                     builder: (context) => PaketSetPage(),
                   ),
                 ).then((_) {
-                  fetchAllPaket(); // Refresh daftar setelah kembali
+                  fetchAllPaket();
                 });
               },
               child: const Text('Tambah Paket'),

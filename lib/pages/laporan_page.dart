@@ -34,14 +34,12 @@ class LaporanPage extends StatelessWidget {
           double totalPemasukanAktif = 0;
           double totalPemasukanSelesai = 0;
 
-          // Menghitung total pemasukan untuk data aktif
           sewaDocs.forEach((doc) {
             final data = doc.data() as Map<String, dynamic>;
             final harga = data['total_biaya'] ?? 0;
             totalPemasukanAktif += harga;
           });
 
-          // Menghitung total pemasukan untuk data selesai
           selesaiDocs.forEach((doc) {
             final data = doc.data() as Map<String, dynamic>;
             final harga = data['total_biaya'] ?? 0;
@@ -79,7 +77,6 @@ class LaporanPage extends StatelessWidget {
                       final harga = data['total_biaya'] ?? 0;
                       final sewaId = sewaDocs[index].id;
 
-                      // Ambil dan format tanggal pengembalian
                       final tanggalPengembalian = data['tanggal_pengembalian'];
                       String tanggalPengembalianFormatted = '';
                       if (tanggalPengembalian != null) {
@@ -94,8 +91,7 @@ class LaporanPage extends StatelessWidget {
                             MaterialPageRoute(
                               builder: (context) => InvoicePage(
                                 sewaId: sewaId,
-                                isCompleted:
-                                    false, // Menandakan bahwa ini dari dbsewa
+                                isCompleted: false,
                               ),
                             ),
                           );
@@ -157,7 +153,6 @@ class LaporanPage extends StatelessWidget {
                       final harga = data['total_biaya'] ?? 0;
                       final selesaiId = selesaiDocs[index].id;
 
-                      // Ambil dan format tanggal pengembalian
                       final tanggalPengembalian = data['tanggal_pengembalian'];
                       String tanggalPengembalianFormatted = '';
                       if (tanggalPengembalian != null) {
@@ -172,8 +167,7 @@ class LaporanPage extends StatelessWidget {
                             MaterialPageRoute(
                               builder: (context) => InvoicePage(
                                 sewaId: selesaiId,
-                                isCompleted:
-                                    true, // Menandakan bahwa ini dari dbselesai
+                                isCompleted: true,
                               ),
                             ),
                           );

@@ -30,7 +30,7 @@ class _SewaPageState extends State<SewaPage> {
 
   String generateInvoiceNumber() {
     DateTime now = DateTime.now();
-    return DateFormat('yyyyMMddHHmmss').format(now); // Format: YYYYMMDDHHMMSS
+    return DateFormat('yyyyMMddHHmmss').format(now);
   }
 
   void calculateTotal() {
@@ -201,8 +201,7 @@ class _SewaPageState extends State<SewaPage> {
                       }
                     }
                     calculateTotal();
-                    Navigator.of(context)
-                        .pop(); // Tutup dialog setelah memilih paket
+                    Navigator.of(context).pop();
                   },
                 );
               }).toList(),
@@ -238,7 +237,7 @@ class _SewaPageState extends State<SewaPage> {
       "barang": selectedBarang,
       "paket": selectedPaket,
       "total_biaya": totalCost,
-      "no_invoice": invoiceNumber, // Menambahkan nomor invoice ke data
+      "no_invoice": invoiceNumber,
     };
 
     try {
@@ -255,7 +254,7 @@ class _SewaPageState extends State<SewaPage> {
         totalCost = 0;
         startDate = null;
         endDate = null;
-        invoiceNumber = generateInvoiceNumber(); // Generate invoice baru
+        invoiceNumber = generateInvoiceNumber();
       });
     } catch (error) {
       ScaffoldMessenger.of(context)
@@ -434,8 +433,8 @@ class _SewaPageState extends State<SewaPage> {
 
   void removePaket() {
     setState(() {
-      selectedPaket = null; // Menghapus paket yang dipilih
-      paketIsi.clear(); // Menghapus isi paket
+      selectedPaket = null;
+      paketIsi.clear();
       calculateTotal();
     });
   }

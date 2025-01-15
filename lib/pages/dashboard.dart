@@ -12,10 +12,9 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  final int _limit = 25; // Batasi jumlah item yang ditampilkan
-  DocumentSnapshot?
-      _lastDocument; // Untuk menyimpan dokumen terakhir yang dimuat
-  List<Map<String, dynamic>> _rentals = []; // Daftar sewa aktif
+  final int _limit = 25;
+  DocumentSnapshot? _lastDocument;
+  List<Map<String, dynamic>> _rentals = [];
 
   @override
   void initState() {
@@ -26,8 +25,8 @@ class _DashboardState extends State<Dashboard> {
   Future<void> fetchActiveRentals() async {
     Query query = FirebaseFirestore.instance
         .collection("dbsewa")
-        .orderBy("tanggal_peminjaman") // Urutkan berdasarkan tanggal peminjaman
-        .limit(_limit); // Menggunakan limit yang baru
+        .orderBy("tanggal_peminjaman")
+        .limit(_limit);
 
     if (_lastDocument != null) {
       query = query.startAfterDocument(_lastDocument!);
@@ -35,33 +34,29 @@ class _DashboardState extends State<Dashboard> {
 
     QuerySnapshot querySnapshot = await query.get();
     if (querySnapshot.docs.isNotEmpty) {
-      _lastDocument = querySnapshot.docs.last; // Simpan dokumen terakhir
+      _lastDocument = querySnapshot.docs.last;
       List<Map<String, dynamic>> rentals = querySnapshot.docs.map((doc) {
         var data = doc.data() as Map<String, dynamic>;
-        data['id'] = doc.id; // Menyimpan ID dokumen
+        data['id'] = doc.id;
         return data;
       }).toList();
 
       setState(() {
-        _rentals.addAll(rentals); // Tambahkan data baru ke daftar
+        _rentals.addAll(rentals);
       });
     }
   }
 
-  // Fungsi untuk memformat tanggal
   String formatDate(DateTime? date) {
     if (date == null) return '';
-    return DateFormat('dd-MM-yyyy').format(date); // Format tanggal-bulan-tahun
+    return DateFormat('dd-MM-yyyy').format(date);
   }
 
-  // Fungsi untuk logout
   Future<void> _logout() async {
     try {
-      await FirebaseAuth.instance.signOut(); // Mengeluarkan pengguna
-      Navigator.pushReplacementNamed(
-          context, '/login'); // Navigasi ke halaman login
+      await FirebaseAuth.instance.signOut();
+      Navigator.pushReplacementNamed(context, '/login');
     } catch (e) {
-      // Menangani kesalahan jika terjadi saat logout
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Gagal logout: $e')),
       );
@@ -117,7 +112,7 @@ class _DashboardState extends State<Dashboard> {
                   ListTile(
                     title: const Text('Logout',
                         style: TextStyle(color: Colors.white)),
-                    onTap: _logout, // Panggil fungsi logout saat di tekan
+                    onTap: _logout,
                   ),
                 ],
               ),
@@ -130,21 +125,19 @@ class _DashboardState extends State<Dashboard> {
         child: RefreshIndicator(
           onRefresh: () async {
             setState(() {
-              _rentals.clear(); // Bersihkan daftar saat refresh
-              _lastDocument = null; // Reset dokumen terakhir
+              _rentals.clear();
+              _lastDocument = null;
             });
-            await fetchActiveRentals(); // Muat ulang data
+            await fetchActiveRentals();
           },
           child: Column(
             children: [
               const SizedBox(height: 16),
               Expanded(
                 child: ListView.builder(
-                  itemCount:
-                      _rentals.length + 1, // Tambahkan 1 untuk tombol load more
+                  itemCount: _rentals.length + 1,
                   itemBuilder: (context, index) {
                     if (index == _rentals.length) {
-                      // Tampilkan tombol load more jika belum memuat semua data
                       return ElevatedButton(
                         onPressed: fetchActiveRentals,
                         child: const Text('Load More'),
@@ -153,7 +146,6 @@ class _DashboardState extends State<Dashboard> {
 
                     final rental = _rentals[index];
 
-                    // Format tanggal
                     String formattedStartDate = formatDate(
                         (rental["tanggal_peminjaman"] as Timestamp).toDate());
                     String formattedEndDate = formatDate(
@@ -161,7 +153,6 @@ class _DashboardState extends State<Dashboard> {
 
                     return GestureDetector(
                       onTap: () {
-                        // Navigasi ke halaman invoice dengan ID sewa
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -186,14 +177,13 @@ class _DashboardState extends State<Dashboard> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  rental[
-                                      "nama"], // Ganti dengan field yang sesuai
+                                  rental["nama"],
                                   style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold),
                                 ),
                                 Text(
-                                  'Rp ${NumberFormat('#,###').format(rental["total_biaya"])}', // Menggunakan format yang diinginkan
+                                  'Rp ${NumberFormat('#,###').format(rental["total_biaya"])}',
                                   style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold),
@@ -202,11 +192,11 @@ class _DashboardState extends State<Dashboard> {
                             ),
                             const SizedBox(height: 8.0),
                             Text(
-                              'Tgl Peminjaman: $formattedStartDate', // Tampilkan tanggal yang diformat
+                              'Tgl Peminjaman: $formattedStartDate',
                               style: TextStyle(fontSize: 14),
                             ),
                             Text(
-                              'Tgl Pengembalian: $formattedEndDate', // Tampilkan tanggal yang diformat
+                              'Tgl Pengembalian: $formattedEndDate',
                               style: TextStyle(fontSize: 14),
                             ),
                           ],

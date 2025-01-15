@@ -2,16 +2,21 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class InvoicePage extends StatelessWidget {
+class InvoicePage extends StatefulWidget {
   final String sewaId;
   final bool isCompleted;
 
   InvoicePage({required this.sewaId, this.isCompleted = false});
 
+  @override
+  _InvoicePageState createState() => _InvoicePageState();
+}
+
+class _InvoicePageState extends State<InvoicePage> {
   Future<Map<String, dynamic>?> fetchData() async {
     DocumentSnapshot snapshot = await FirebaseFirestore.instance
-        .collection(isCompleted ? 'dbselesai' : 'dbsewa')
-        .doc(sewaId)
+        .collection(widget.isCompleted ? 'dbselesai' : 'dbsewa')
+        .doc(widget.sewaId)
         .get();
     return snapshot.data() as Map<String, dynamic>?;
   }
@@ -21,45 +26,44 @@ class InvoicePage extends StatelessWidget {
     return DateFormat('dd-MM-yyyy').format(date);
   }
 
-  Future<void> moveDataToCompleted(BuildContext context) async {
+  Future<void> moveDataToCompleted() async {
     final sewaData = await fetchData();
     if (sewaData != null) {
-      // Simpan data ke dbselesai
       await FirebaseFirestore.instance.collection('dbselesai').add(sewaData);
-      // Hapus data dari dbsewa jika berasal dari dbsewa
-      if (!isCompleted) {
+      if (!widget.isCompleted) {
         await FirebaseFirestore.instance
             .collection('dbsewa')
-            .doc(sewaId)
+            .doc(widget.sewaId)
             .delete();
       }
 
-      // Tampilkan pesan sukses
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Data berhasil dipindahkan ke dbselesai')),
-      );
-      Navigator.pop(context); // Kembali ke halaman sebelumnya
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Transaksi selesai')),
+        );
+        Navigator.pop(context);
+      }
     }
   }
 
   void showConfirmationDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return AlertDialog(
           title: Text('Selesai?'),
           content: Text('Konfirmasi jika transaksi ini selesai'),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Tutup dialog
+                Navigator.of(dialogContext).pop();
               },
               child: Text('Batal'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Tutup dialog
-                moveDataToCompleted(context); // Pindahkan data
+                Navigator.of(dialogContext).pop();
+                moveDataToCompleted();
               },
               child: Text('Ya'),
             ),
@@ -234,14 +238,14 @@ class InvoicePage extends StatelessWidget {
           );
         },
       ),
-      floatingActionButton: !isCompleted
+      floatingActionButton: !widget.isCompleted
           ? FloatingActionButton(
               onPressed: () {
-                showConfirmationDialog(context); // Tampilkan dialog konfirmasi
+                showConfirmationDialog(context);
               },
-              child: Icon(Icons.check), // Simbol centang
+              child: Icon(Icons.check),
               backgroundColor: Colors.green,
-              tooltip: 'Pindahkan ke dbselesai', // Tooltip untuk tombol
+              tooltip: 'Pindahkan ke dbselesai',
             )
           : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,

@@ -12,25 +12,20 @@ class LoginPage extends StatelessWidget {
     String password = passwordController.text.trim();
 
     try {
-      // Ambil data pengguna dari koleksi "akun"
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('akun')
           .where('username', isEqualTo: username)
           .where('password', isEqualTo: password)
           .get();
 
-      // Memeriksa apakah ada hasil
       if (querySnapshot.docs.isNotEmpty) {
-        // Jika ada, navigasi ke dashboard
         Navigator.pushReplacementNamed(context, '/dashboard');
       } else {
-        // Jika tidak ada, tampilkan pesan kesalahan
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Username atau password salah')),
         );
       }
     } catch (e) {
-      // Menangani kesalahan saat mengambil data dari Firestore
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
