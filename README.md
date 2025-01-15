@@ -1,3 +1,2 @@
-# crud
 # Aplikasi Rental Alat Kemah
-SOKO Project - Firebase - Flutter
+SOKO Project - Firebase - Flutter - CRUD
